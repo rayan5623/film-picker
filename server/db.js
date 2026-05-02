@@ -10,6 +10,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL UNIQUE,
     genre TEXT DEFAULT '',
+    type TEXT DEFAULT 'film',
     watched INTEGER DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now'))
   )
@@ -23,13 +24,14 @@ try {
 }
 
 export const getAll = () => db.prepare('SELECT * FROM films ORDER BY created_at DESC').all();
-export const insert = (title, genre) => db.prepare('INSERT INTO films (title, genre) VALUES (?, ?)').run(title, genre);
+export const insert = (title, genre, type = 'film') =>
+  db.prepare('INSERT INTO films (title, genre, type) VALUES (?, ?, ?)').run(title, genre, type);
 export const toggleWatched = (id) => db.prepare('UPDATE films SET watched = NOT watched WHERE id = ?').run(id);
 export const remove = (id) => db.prepare('DELETE FROM films WHERE id = ?').run(id);
 export const bulkInsert = (films) => {
-  const stmt = db.prepare('INSERT OR IGNORE INTO films (title, genre) VALUES (?, ?)');
+  const stmt = db.prepare('INSERT OR IGNORE INTO films (title, genre, type) VALUES (?, ?, ?)');
   const insertMany = db.transaction((list) => {
-    for (const f of list) stmt.run(f.title, f.genre || '');
+    for (const f of list) stmt.run(f.title, f.genre || '', f.type || 'film');
   });
   insertMany(films);
 };
