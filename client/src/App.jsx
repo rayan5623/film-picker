@@ -86,6 +86,21 @@ const loadFilms = async () => {
       {tab === 0 && <ImportTab api={API} onImport={(f) => { setFilms(f); setTab(1); }} />}
       {tab === 1 && <ListTab api={API} films={films} onUpdate={setFilms} />}
       {tab === 2 && <RandomTab films={films} onUpdate={setFilms} />}
+
+        {/* BuyMeACoffee */}
+<div style={{ textAlign: 'center', marginTop: 48, paddingTop: 24, borderTop: '1px solid var(--border)' }}>
+  <a href="https://buymeacoffee.com/couchstudio" target="_blank" rel="noopener noreferrer">
+    <img
+      src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+      alt="Buy Me A Coffee"
+      style={{ height: 45, borderRadius: 8 }}
+    />
+  </a>
+  <p style={{ color: 'var(--muted)', fontSize: 12, marginTop: 8 }}>
+    Ti è utile? Offrimi un caffè ☕
+  </p>
+</div>
+
     </div>
   );
 }
