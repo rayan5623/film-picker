@@ -12,11 +12,23 @@ dotenv.config();
 
 const app = express();
 
-const upload = multer({
+// per immagini
+const uploadImage = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!file.mimetype.startsWith('image/')) {
       return cb(new Error('Solo immagini accettate'));
+    }
+    cb(null, true);
+  }
+});
+
+// per CSV
+const uploadCSV = multer({
+  limits: { fileSize: 1 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.includes('csv') && !file.mimetype.includes('text')) {
+      return cb(new Error('Solo file CSV accettati'));
     }
     cb(null, true);
   }
