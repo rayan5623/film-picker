@@ -11,8 +11,16 @@ const TABS = ['📥 Importa', '🎬 Lista', '🎲 Scegli'];
 export default function App() {
   const [tab, setTab] = useState(0);
   const [films, setFilms] = useState([]);
+  const [serverError, setServerError] = useState(false);
 
- const [serverError, setServerError] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+  return localStorage.getItem('theme') !== 'light';
+});
+
+useEffect(() => {
+  localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+  document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+}, [darkMode]);
 
 const loadFilms = async () => {
   try {
@@ -40,6 +48,23 @@ const loadFilms = async () => {
           Importa da TvTime · gestisci la lista · trova il film di stasera
         </p>
       </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
+  <div>
+    <h1 style={{ background: 'linear-gradient(90deg, #7c6af7, #f76ab4)',
+      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+      🎬 Film Picker
+    </h1>
+    <p style={{ color: 'var(--muted)', marginTop: 4 }}>
+      Importa da TvTime · gestisci la lista · trova il film di stasera
+    </p>
+  </div>
+  <button onClick={() => setDarkMode(prev => !prev)}
+    style={{ background: 'var(--surface)', border: '1px solid var(--border)',
+      color: 'var(--text)', padding: '8px 12px', fontSize: 18, borderRadius: 'var(--radius)' }}>
+    {darkMode ? '☀️' : '🌙'}
+  </button>
+</div>
 
       {serverError && (
   <div style={{
