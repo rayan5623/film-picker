@@ -39,16 +39,6 @@ const loadFilms = async () => {
 
   return (
     <div style={{ maxWidth: 700, margin: '0 auto', padding: '32px 16px' }}>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ background: 'linear-gradient(90deg, #7c6af7, #f76ab4)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          🎬 Film Picker
-        </h1>
-        <p style={{ color: 'var(--muted)', marginTop: 4 }}>
-          Importa da TvTime · gestisci la lista · trova il film di stasera
-        </p>
-      </div>
-
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
   <div>
     <h1 style={{ background: 'linear-gradient(90deg, #7c6af7, #f76ab4)',
