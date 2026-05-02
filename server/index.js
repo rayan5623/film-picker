@@ -70,19 +70,15 @@ app.get('/api/health', (req, res) => {
 });
 
 // CRUD films
+app.get('/api/films', (req, res) => {
+  res.json(getAll());
+});
+
 app.post('/api/films', (req, res) => {
   const { title, genre, type } = req.body;
   if (!title?.trim()) return res.status(400).json({ error: 'Titolo obbligatorio' });
   if (title.length > 200) return res.status(400).json({ error: 'Titolo troppo lungo' });
   insert(title.trim(), (genre || '').slice(0, 200), type || 'film');
-  res.json(getAll());
-});
-
-app.post('/api/films', (req, res) => {
-  const { title, genre } = req.body;
-  if (!title?.trim()) return res.status(400).json({ error: 'Titolo obbligatorio' });
-  if (title.length > 200) return res.status(400).json({ error: 'Titolo troppo lungo' });
-  insert(title.trim(), (genre || '').slice(0, 200));
   res.json(getAll());
 });
 
