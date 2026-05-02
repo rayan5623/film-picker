@@ -105,7 +105,7 @@ app.post('/api/films/bulk', (req, res) => {
 });
 
 // Import CSV
-app.post('/api/import/csv', upload.single('file'), (req, res) => {
+app.post('/api/import/csv', uploadCSV.single('file'), (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'File mancante' });
     const text = req.file.buffer.toString('utf8');
@@ -125,7 +125,7 @@ app.post('/api/import/csv', upload.single('file'), (req, res) => {
 });
 
 // Extract da screenshot
-app.post('/api/extract', extractLimiter, upload.single('image'), async (req, res) => {
+app.post('/api/extract', extractLimiter, uploadImage.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Immagine mancante' });
 
