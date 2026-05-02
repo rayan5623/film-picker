@@ -1,0 +1,6 @@
+server/.env
+server/films.db
+**/node_modules
+client/dist
+*.log
+EOF
