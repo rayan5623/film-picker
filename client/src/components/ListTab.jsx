@@ -4,14 +4,25 @@ import axios from 'axios';
 export default function ListTab({ api, films, onUpdate }) {
   const [title, setTitle] = useState('');
   const [genre, setGenre] = useState('');
+  const [type, setType] = useState('film');
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [sort, setSort] = useState('newest');
+  const [feedback, setFeedback] = useState('');
 
   const handleAdd = async () => {
     if (!title.trim()) return;
-    const res = await axios.post(`${api}/api/films`, { title: title.trim(), genre });
-    onUpdate(res.data);
-    setTitle(''); setGenre('');
+    try {
+      const res = await axios.post(`${api}/api/films`, { title: title.trim(), genre, type });
+      onUpdate(res.data);
+      setTitle(''); setGenre('');
+      setFeedback(`"${title.trim()}" aggiunto!`);
+      setTimeout(() => setFeedback(''), 2500);
+    } catch (err) {
+      setFeedback(err.response?.data?.error || 'Errore');
+      setTimeout(() => setFeedback(''), 2500);
+    }
   };
 
   const handleToggle = async (id) => {
@@ -24,40 +35,96 @@ export default function ListTab({ api, films, onUpdate }) {
     onUpdate(res.data);
   };
 
-  const visible = films.filter(f => {
+  const sorted = [...films].sort((a, b) => {
+    if (sort === 'newest') return b.id - a.id;
+    if (sort === 'oldest') return a.id - b.id;
+    if (sort === 'az') return a.title.localeCompare(b.title);
+    if (sort === 'za') return b.title.localeCompare(a.title);
+    return 0;
+  });
+
+  const visible = sorted.filter(f => {
     if (filter === 'unwatched' && f.watched) return false;
     if (filter === 'watched' && !f.watched) return false;
+    if (typeFilter !== 'all' && f.type !== typeFilter) return false;
     if (search && !f.title.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
+  const total = films.length;
+  const watched = films.filter(f => f.watched).length;
+  const unwatched = total - watched;
+
   return (
     <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+      {/* Contatore */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+        {[
+          { label: 'Totale', value: total, color: 'var(--accent)' },
+          { label: 'Da vedere', value: unwatched, color: 'var(--success)' },
+          { label: 'Visti', value: watched, color: 'var(--muted)' },
+        ].map(({ label, value, color }) => (
+          <div key={label} style={{
+            flex: 1, background: 'var(--surface)', borderRadius: 'var(--radius)',
+            padding: '12px 0', textAlign: 'center'
+          }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color }}>{value}</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Aggiunta manuale */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
         <input style={{ flex: 1, minWidth: 140 }} placeholder="Titolo..."
           value={title} onChange={e => setTitle(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleAdd()} />
-        <input style={{ width: 140 }} placeholder="Genere..."
+        <input style={{ width: 120 }} placeholder="Genere..."
           value={genre} onChange={e => setGenre(e.target.value)} />
+        <select value={type} onChange={e => setType(e.target.value)}>
+          <option value="film">🎬 Film</option>
+          <option value="serie">📺 Serie</option>
+        </select>
         <button onClick={handleAdd}>+ Aggiungi</button>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input style={{ width: 160 }} placeholder="🔍 Cerca..."
+      {/* Feedback */}
+      {feedback && (
+        <div style={{ fontSize: 13, color: 'var(--success)', marginBottom: 8 }}>
+          ✓ {feedback}
+        </div>
+      )}
+
+      {/* Filtri */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+        <input style={{ width: 140 }} placeholder="🔍 Cerca..."
           value={search} onChange={e => setSearch(e.target.value)} />
         <select value={filter} onChange={e => setFilter(e.target.value)}>
           <option value="all">Tutti</option>
           <option value="unwatched">Da vedere</option>
           <option value="watched">Già visti</option>
         </select>
+        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+          <option value="all">🎬📺 Tutti</option>
+          <option value="film">🎬 Film</option>
+          <option value="serie">📺 Serie</option>
+        </select>
+        <select value={sort} onChange={e => setSort(e.target.value)}>
+          <option value="newest">Più recenti</option>
+          <option value="oldest">Più vecchi</option>
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+        </select>
         <span style={{ marginLeft: 'auto', color: 'var(--muted)', fontSize: 13 }}>
-          {visible.length} film
+          {visible.length} titoli
         </span>
       </div>
 
       {visible.length === 0 && (
         <p style={{ color: 'var(--muted)', textAlign: 'center', padding: 32 }}>
-          Nessun film trovato.
+          {films.length === 0
+            ? '📭 Lista vuota — importa da TvTime o aggiungi un titolo!'
+            : 'Nessun titolo trovato.'}
         </p>
       )}
 
@@ -71,7 +138,7 @@ export default function ListTab({ api, films, onUpdate }) {
           }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 500, textDecoration: f.watched ? 'line-through' : 'none' }}>
-                {f.title}
+                {f.type === 'serie' ? '📺' : '🎬'} {f.title}
               </div>
               {f.genre && <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{f.genre}</div>}
             </div>

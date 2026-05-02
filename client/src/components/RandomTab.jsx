@@ -1,12 +1,17 @@
 import { useState } from 'react';
-import axios from 'axios';
 
 export default function RandomTab({ films, onUpdate }) {
+  const [typeFilter, setTypeFilter] = useState('all');
   const [pick, setPick] = useState(null);
   const [rolling, setRolling] = useState(false);
   const [ignored, setIgnored] = useState([]);
 
-  const pool = films.filter(f => !f.watched && !ignored.includes(f.id));
+  const pool = films.filter(f => {
+    if (f.watched) return false;
+    if (ignored.includes(f.id)) return false;
+    if (typeFilter !== 'all' && f.type !== typeFilter) return false;
+    return true;
+  });
 
   const spin = () => {
     if (!pool.length) return;
@@ -36,9 +41,21 @@ export default function RandomTab({ films, onUpdate }) {
   return (
     <div style={{ textAlign: 'center', padding: '16px 0' }}>
 
+      {/* Filtro tipo — QUI, prima di tutto il resto */}
+      <div style={{ marginBottom: 16 }}>
+        <select
+          value={typeFilter}
+          onChange={e => { setTypeFilter(e.target.value); setPick(null); }}
+          style={{ width: '100%' }}>
+          <option value="all">🎬📺 Film e Serie</option>
+          <option value="film">🎬 Solo Film</option>
+          <option value="serie">📺 Solo Serie</option>
+        </select>
+      </div>
+
       {ignored.length > 0 && (
         <div style={{ marginBottom: 16, fontSize: 13, color: 'var(--muted)' }}>
-          {ignored.length} film ignorati stasera —{' '}
+          {ignored.length} titoli ignorati stasera —{' '}
           <span onClick={reset} style={{ color: 'var(--accent)', cursor: 'pointer' }}>
             reimposta
           </span>
@@ -62,7 +79,7 @@ export default function RandomTab({ films, onUpdate }) {
               WebkitBackgroundClip: rolling ? 'unset' : 'text',
               WebkitTextFillColor: rolling ? 'var(--text)' : 'transparent'
             }}>
-              {pick.title}
+              {pick.type === 'serie' ? '📺' : '🎬'} {pick.title}
             </div>
             {pick.genre && (
               <div style={{ color: 'var(--muted)', marginTop: 8, fontSize: 13 }}>{pick.genre}</div>
@@ -71,8 +88,8 @@ export default function RandomTab({ films, onUpdate }) {
         ) : (
           <p style={{ color: 'var(--muted)' }}>
             {pool.length === 0 && ignored.length > 0
-              ? '😅 Hai ignorato tutti i film!'
-              : 'Premi il pulsante per scegliere un film!'}
+              ? '😅 Hai ignorato tutto!'
+              : 'Premi il pulsante per scegliere!'}
           </p>
         )}
       </div>
@@ -94,7 +111,7 @@ export default function RandomTab({ films, onUpdate }) {
 
       {!pool.length && ignored.length === 0 && (
         <p style={{ color: 'var(--muted)', marginTop: 12, fontSize: 13 }}>
-          Nessun film da vedere nella lista.
+          Nessun titolo da vedere nella lista.
         </p>
       )}
 
