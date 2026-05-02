@@ -106,7 +106,7 @@ export default function ImportTab({ api, onImport }) {
               ))}
             </div>
             <button onClick={handleImport} style={{ width: '100%' }}>
-              ➕ Aggiungi {selected.length} film alla lista
+              ➕ Aggiungi {selected.length} {selected.length === 1 ? 'titolo' : 'titoli'} alla lista
             </button>
           </div>
         )}
