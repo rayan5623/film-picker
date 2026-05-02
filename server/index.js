@@ -112,8 +112,12 @@ app.post('/api/import/csv', uploadCSV.single('file'), (req, res) => {
     const lines = text.trim().split('\n').slice(1);
     const films = lines
       .map(line => {
-        const [title, genre] = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-        return title ? { title: title.slice(0, 200), genre: (genre || '').slice(0, 200) } : null;
+        const [title, genre, type] = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+        return title ? {
+          title: title.slice(0, 200),
+          genre: (genre || '').slice(0, 200),
+          type: type === 'serie' ? 'serie' : 'film'
+        } : null;
       })
       .filter(Boolean)
       .slice(0, 500);
@@ -144,7 +148,7 @@ app.post('/api/extract', extractLimiter, uploadImage.single('image'), async (req
           },
           {
             type: 'text',
-            text: 'Questa è una screenshot della watchlist film di TvTime. Estrai tutti i titoli visibili con i loro generi. Rispondi SOLO con JSON array, nessun testo extra, nessun markdown. Formato: [{"title":"Titolo","genre":"Genere1, Genere2"}]. Se non trovi film: []'
+            text: 'Questa è una screenshot della watchlist di TvTime. Estrai tutti i titoli visibili con i loro generi e tipo. Rispondi SOLO con JSON array, nessun testo extra, nessun markdown. Formato: [{"title":"Titolo","genre":"Genere1, Genere2","type":"film"}] per i film e [{"title":"Titolo","genre":"Genere1, Genere2","type":"serie"}] per le serie TV. Se non trovi titoli: []'
           }
         ]
       }]
@@ -154,7 +158,11 @@ app.post('/api/extract', extractLimiter, uploadImage.single('image'), async (req
     let films = [];
     try {
       const jsonMatch = text.match(/\[[\s\S]*\]/);
-      films = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+      const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+      films = parsed.map(f => ({
+        ...f,
+        type: f.type === 'serie' ? 'serie' : 'film'
+      }));
     } catch (parseErr) {
       console.error('JSON malformato da Anthropic:', text);
       films = [];
