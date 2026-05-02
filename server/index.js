@@ -12,18 +12,15 @@ const app = express();
 const upload = multer();
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-// sostituisci app.use(cors()) con questo:
 const allowedOrigins = process.env.CLIENT_URL
   ? [process.env.CLIENT_URL]
   : ['http://localhost:5173'];
 
-app.use(helmet());
 app.use(cors({
   origin: allowedOrigins,
   methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type']
 }));
-app.use(express.json());
 
 // CRUD films
 app.get('/api/films', (req, res) => {
