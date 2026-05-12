@@ -1,7 +1,7 @@
 export const translations = {
   it: {
     title: 'RandomTime',
-    subtitle: 'Importa da TvTime · gestisci la lista · trova il titolo di stasera',
+    subtitle: "L'amico che non ti dice mai 'boh, scegli tu'.",    
     tabs: ['📥 Importa', '🎬 Lista', '🎲 Scegli'],
     import: {
       screenshotTitle: '📷 Da screenshot TvTime',
@@ -57,7 +57,7 @@ export const translations = {
   },
   en: {
     title: 'RandomTime',
-    subtitle: 'Import from TvTime · manage your list · find tonight\'s title',
+    subtitle: "The friend who never says 'I don't know, you pick'.",
     tabs: ['📥 Import', '🎬 List', '🎲 Pick'],
     import: {
       screenshotTitle: '📷 From TvTime screenshot',
