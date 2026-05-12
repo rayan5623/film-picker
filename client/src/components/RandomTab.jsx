@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useLang } from '../LangContext';
 
-export default function RandomTab({ films, onUpdate }) {
+export default function RandomTab({ films }) {
+  const { t } = useLang();
   const [typeFilter, setTypeFilter] = useState('all');
   const [pick, setPick] = useState(null);
   const [rolling, setRolling] = useState(false);
@@ -41,23 +43,22 @@ export default function RandomTab({ films, onUpdate }) {
   return (
     <div style={{ textAlign: 'center', padding: '16px 0' }}>
 
-      {/* Filtro tipo — QUI, prima di tutto il resto */}
+      {/* Filtro tipo */}
       <div style={{ marginBottom: 16 }}>
-        <select
-          value={typeFilter}
+        <select value={typeFilter}
           onChange={e => { setTypeFilter(e.target.value); setPick(null); }}
           style={{ width: '100%' }}>
-          <option value="all">🎬📺 Film e Serie</option>
-          <option value="film">🎬 Solo Film</option>
-          <option value="serie">📺 Solo Serie</option>
+          <option value="all">{t.random.allTypes}</option>
+          <option value="film">{t.random.onlyFilms}</option>
+          <option value="serie">{t.random.onlySeries}</option>
         </select>
       </div>
 
       {ignored.length > 0 && (
         <div style={{ marginBottom: 16, fontSize: 13, color: 'var(--muted)' }}>
-          {ignored.length} titoli ignorati stasera —{' '}
+          {ignored.length} {t.random.ignored}{' '}
           <span onClick={reset} style={{ color: 'var(--accent)', cursor: 'pointer' }}>
-            reimposta
+            {t.random.reset}
           </span>
         </div>
       )}
@@ -87,9 +88,7 @@ export default function RandomTab({ films, onUpdate }) {
           </>
         ) : (
           <p style={{ color: 'var(--muted)' }}>
-            {pool.length === 0 && ignored.length > 0
-              ? '😅 Hai ignorato tutto!'
-              : 'Premi il pulsante per scegliere!'}
+            {pool.length === 0 && ignored.length > 0 ? t.random.ignoredAll : t.random.press}
           </p>
         )}
       </div>
@@ -98,38 +97,38 @@ export default function RandomTab({ films, onUpdate }) {
         <button onClick={spin} disabled={!pool.length || rolling}
           style={{ fontSize: 16, padding: '14px 36px',
             background: 'linear-gradient(90deg, #7c6af7, #f76ab4)' }}>
-          🎲 Scegli per me
+          {t.random.spin}
         </button>
 
         {pick && !rolling && (
           <button onClick={ignore} className="ghost"
             style={{ fontSize: 16, padding: '14px 20px' }}>
-            👎 Ignora stasera
+            {t.random.ignore}
           </button>
         )}
       </div>
 
       {!pool.length && ignored.length === 0 && (
         <p style={{ color: 'var(--muted)', marginTop: 12, fontSize: 13 }}>
-          Nessun titolo da vedere nella lista.
+          {t.random.empty}
         </p>
       )}
 
       {pool.length === 0 && ignored.length > 0 && (
         <button onClick={reset} className="ghost" style={{ marginTop: 16 }}>
-          🔄 Reimposta tutto
+          {t.random.resetAll}
         </button>
       )}
 
       {pick && !rolling && pool.length > 1 && (
         <p style={{ color: 'var(--muted)', marginTop: 16, fontSize: 13 }}>
-          Non ti convince?{' '}
+          {t.random.notConvinced}{' '}
           <span onClick={spin} style={{ color: 'var(--accent)', cursor: 'pointer' }}>
-            Riprova
+            {t.random.retry}
           </span>
           {' · '}
           <span onClick={ignore} style={{ color: 'var(--muted)', cursor: 'pointer' }}>
-            Ignora stasera
+            {t.random.ignore}
           </span>
         </p>
       )}

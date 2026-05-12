@@ -1,7 +1,9 @@
 import { useState, useRef } from 'react';
 import axios from 'axios';
+import { useLang } from '../LangContext';
 
 export default function ImportTab({ api, onImport }) {
+  const { t } = useLang();
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,7 @@ export default function ImportTab({ api, onImport }) {
     formData.append('file', f);
     try {
       const res = await axios.post(`${api}/api/import/csv`, formData);
-      alert(`Importati ${res.data.imported} film!`);
+      alert(`Importati ${res.data.imported} titoli!`);
       onImport(res.data.films);
     } catch (err) {
       alert('Errore CSV: ' + err.message);
@@ -58,15 +60,16 @@ export default function ImportTab({ api, onImport }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* Screenshot */}
-      <div style={{
-        background: 'var(--surface)', border: '1px solid var(--accent)',
-        borderRadius: 'var(--radius)', padding: '10px 14px',
-        fontSize: 13, color: 'var(--muted)', marginBottom: 12
-        }}>
-  💡  <strong style={{ color: 'var(--text)' }}>Suggerimento:</strong> per risultati migliori usa la <strong style={{ color: 'var(--accent)' }}>visualizzazione a lista</strong> su TvTime prima di fare lo screenshot.
-      </div>
       <div>
-        <h2 style={{ marginBottom: 12 }}>📷 Da screenshot TvTime</h2>
+        <h2 style={{ marginBottom: 12 }}>{t.import.screenshotTitle}</h2>
+        <div style={{
+          background: 'var(--surface)', border: '1px solid var(--accent)',
+          borderRadius: 'var(--radius)', padding: '10px 14px',
+          fontSize: 13, color: 'var(--muted)', marginBottom: 12
+        }}>
+          💡 <strong style={{ color: 'var(--text)' }}>{t.import.screenshotHint}</strong>
+        </div>
+
         <div onClick={() => imgRef.current.click()} style={{
           border: '2px dashed var(--border)', borderRadius: 'var(--radius)',
           padding: preview ? 8 : 40, textAlign: 'center', cursor: 'pointer',
@@ -76,12 +79,12 @@ export default function ImportTab({ api, onImport }) {
             onChange={handleFile} style={{ display: 'none' }} />
           {preview
             ? <img src={preview} alt="preview" style={{ maxWidth: '100%', maxHeight: 280, borderRadius: 6 }} />
-            : <p style={{ color: 'var(--muted)' }}>Clicca per caricare uno screenshot</p>}
+            : <p style={{ color: 'var(--muted)' }}>{t.import.dropzone}</p>}
         </div>
 
         {file && !results.length && (
           <button onClick={handleExtract} disabled={loading} style={{ marginTop: 12, width: '100%' }}>
-            {loading ? '⏳ Estrazione in corso...' : '✨ Estrai film con AI'}
+            {loading ? t.import.extracting : t.import.extractBtn}
           </button>
         )}
 
@@ -90,7 +93,7 @@ export default function ImportTab({ api, onImport }) {
         {results.length > 0 && (
           <div style={{ marginTop: 16 }}>
             <p style={{ color: 'var(--muted)', marginBottom: 8, fontSize: 13 }}>
-              {results.length} film trovati — deseleziona quelli da escludere:
+              {results.length} {t.import.found}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
               {results.map((film, i) => (
@@ -100,13 +103,15 @@ export default function ImportTab({ api, onImport }) {
                   borderRadius: 'var(--radius)', cursor: 'pointer'
                 }}>
                   <input type="checkbox" checked={selected.includes(i)} onChange={() => toggleSelect(i)} />
-                  <span style={{ flex: 1 }}>{film.title}</span>
+                  <span style={{ flex: 1 }}>
+                    {film.type === 'serie' ? '📺' : '🎬'} {film.title}
+                  </span>
                   {film.genre && <small style={{ color: 'var(--muted)' }}>{film.genre}</small>}
                 </label>
               ))}
             </div>
             <button onClick={handleImport} style={{ width: '100%' }}>
-              ➕ Aggiungi {selected.length} {selected.length === 1 ? 'titolo' : 'titoli'} alla lista
+              ➕ {t.import.importBtn} {selected.length} {t.import.importBtn2}
             </button>
           </div>
         )}
@@ -114,14 +119,14 @@ export default function ImportTab({ api, onImport }) {
 
       {/* CSV */}
       <div style={{ borderTop: '1px solid var(--border)', paddingTop: 24 }}>
-        <h2 style={{ marginBottom: 4 }}>📄 Da file CSV</h2>
+        <h2 style={{ marginBottom: 4 }}>{t.import.csvTitle}</h2>
         <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 12 }}>
-          Il CSV deve avere header: <code style={{ color: 'var(--accent)' }}>title,genre</code>
+          {t.import.csvHint} <code style={{ color: 'var(--accent)' }}>title,genre,type</code>
         </p>
         <input ref={csvRef} type="file" accept=".csv"
           onChange={handleCSV} style={{ display: 'none' }} />
         <button className="ghost" onClick={() => csvRef.current.click()}>
-          📂 Carica CSV
+          {t.import.csvBtn}
         </button>
       </div>
 

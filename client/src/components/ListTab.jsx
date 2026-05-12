@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useLang } from '../LangContext';
 
 export default function ListTab({ api, films, onUpdate }) {
+  const { t } = useLang();
   const [title, setTitle] = useState('');
   const [genre, setGenre] = useState('');
   const [type, setType] = useState('film');
@@ -60,9 +62,9 @@ export default function ListTab({ api, films, onUpdate }) {
       {/* Contatore */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
         {[
-          { label: 'Totale', value: total, color: 'var(--accent)' },
-          { label: 'Da vedere', value: unwatched, color: 'var(--success)' },
-          { label: 'Visti', value: watched, color: 'var(--muted)' },
+          { label: t.list.total, value: total, color: 'var(--accent)' },
+          { label: t.list.toWatch, value: unwatched, color: 'var(--success)' },
+          { label: t.list.seen, value: watched, color: 'var(--muted)' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{
             flex: 1, background: 'var(--surface)', borderRadius: 'var(--radius)',
@@ -76,16 +78,16 @@ export default function ListTab({ api, films, onUpdate }) {
 
       {/* Aggiunta manuale */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        <input style={{ flex: 1, minWidth: 140 }} placeholder="Titolo..."
+        <input style={{ flex: 1, minWidth: 140 }} placeholder={t.list.titlePlaceholder}
           value={title} onChange={e => setTitle(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleAdd()} />
-        <input style={{ width: 120 }} placeholder="Genere..."
+        <input style={{ width: 120 }} placeholder={t.list.genrePlaceholder}
           value={genre} onChange={e => setGenre(e.target.value)} />
         <select value={type} onChange={e => setType(e.target.value)}>
           <option value="film">🎬 Film</option>
           <option value="serie">📺 Serie</option>
         </select>
-        <button onClick={handleAdd}>+ Aggiungi</button>
+        <button onClick={handleAdd}>{t.list.addBtn}</button>
       </div>
 
       {/* Feedback */}
@@ -97,34 +99,32 @@ export default function ListTab({ api, films, onUpdate }) {
 
       {/* Filtri */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input style={{ width: 140 }} placeholder="🔍 Cerca..."
+        <input style={{ width: 140 }} placeholder={t.list.searchPlaceholder}
           value={search} onChange={e => setSearch(e.target.value)} />
         <select value={filter} onChange={e => setFilter(e.target.value)}>
-          <option value="all">Tutti</option>
-          <option value="unwatched">Da vedere</option>
-          <option value="watched">Già visti</option>
+          <option value="all">{t.list.all}</option>
+          <option value="unwatched">{t.list.unwatched}</option>
+          <option value="watched">{t.list.watched}</option>
         </select>
         <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
-          <option value="all">🎬📺 Tutti</option>
-          <option value="film">🎬 Film</option>
-          <option value="serie">📺 Serie</option>
+          <option value="all">{t.list.allTypes}</option>
+          <option value="film">{t.list.onlyFilms}</option>
+          <option value="serie">{t.list.onlySeries}</option>
         </select>
         <select value={sort} onChange={e => setSort(e.target.value)}>
-          <option value="newest">Più recenti</option>
-          <option value="oldest">Più vecchi</option>
+          <option value="newest">{t.list.newest}</option>
+          <option value="oldest">{t.list.oldest}</option>
           <option value="az">A → Z</option>
           <option value="za">Z → A</option>
         </select>
         <span style={{ marginLeft: 'auto', color: 'var(--muted)', fontSize: 13 }}>
-          {visible.length} titoli
+          {visible.length} {t.list.titles}
         </span>
       </div>
 
       {visible.length === 0 && (
         <p style={{ color: 'var(--muted)', textAlign: 'center', padding: 32 }}>
-          {films.length === 0
-            ? '📭 Lista vuota — importa da TvTime o aggiungi un titolo!'
-            : 'Nessun titolo trovato.'}
+          {films.length === 0 ? t.list.empty : t.list.notFound}
         </p>
       )}
 
@@ -145,7 +145,7 @@ export default function ListTab({ api, films, onUpdate }) {
             <button onClick={() => handleToggle(f.id)}
               style={{ background: f.watched ? 'var(--surface2)' : 'var(--success)',
                 color: f.watched ? 'var(--muted)' : '#0f0f13', padding: '6px 12px', fontSize: 13 }}>
-              {f.watched ? '↩ Rivedi' : '✓ Visto'}
+              {f.watched ? t.list.rewatch_btn : t.list.watched_btn}
             </button>
             <button onClick={() => handleRemove(f.id)}
               className="danger" style={{ padding: '6px 10px' }}>✕</button>
