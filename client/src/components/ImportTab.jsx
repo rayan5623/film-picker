@@ -67,7 +67,7 @@ export default function ImportTab({ api, onImport }) {
           borderRadius: 'var(--radius)', padding: '10px 14px',
           fontSize: 13, color: 'var(--muted)', marginBottom: 12
         }}>
-          💡 <strong style={{ color: 'var(--text)' }}>{t.import.screenshotHint}</strong>
+          <strong style={{ color: 'var(--text)' }}>{t.import.screenshotHint}</strong>
         </div>
 
         <div onClick={() => imgRef.current.click()} style={{
